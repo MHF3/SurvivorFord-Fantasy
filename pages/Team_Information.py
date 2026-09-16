@@ -8,5 +8,12 @@ else:
         st.header('Create Your Team!')
         # TODO
     else:
-        # team = data.in
-        st.header(f'In Progres')
+        team = teams.col_values(1).index(st.user.email)
+
+        st.header(teams.col_values(2)[team])
+        st.subheader('Survivors')
+        st.write(teams.col_values(3)[team].replace(' | ', '\n\n'))
+        # TODO Add other survivor info? Images?
+        st.subheader(f'Total Points: {teams.col_values(4)[team]}')
+        st.write('Breakdown:')
+        st.caption('test point gain 1\n\ntest point gain 2')
