@@ -10,12 +10,12 @@ if (st.user.email not in teams.col_values(1)[1:]):
     st.header('Create Your Team!')
     # TODO
 else:
-    team = teams.col_values(1).index(st.user.email)
+    team = teams.col_values(1).index(st.user.email) + 1
 
-    st.header(teams.col_values(2)[team])
+    st.header(teams.cell(team, 2).value)
     st.subheader('Survivors')
-    st.write(teams.col_values(3)[team].replace(' | ', '\n\n'))
+    st.write(teams.cell(team, 3).value.replace(' | ', '\n\n'))
     # TODO Add other survivor info? Images?
-    st.subheader(f'Total Points: {teams.col_values(4)[team]}')
+    st.subheader(f'Total Points: {teams.cell(team, 4).numeric_value}')
     st.write('Breakdown:')
-    st.caption('test point gain 1\n\ntest point gain 2')
+    # st.caption(teams.col_values.replace(' | ', '\n\n'))
