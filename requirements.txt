@@ -1,4 +1,4 @@
 Authlib>=1.3.2
 gspread
-httpx
+httpx2
 streamlit>=1.42.0

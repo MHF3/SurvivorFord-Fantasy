@@ -1,9 +1,11 @@
 import gspread
 import streamlit as st
 
-def login(): st.button('Log In', on_click = st.login, icon = ':material/login:')
-
 if st.user.is_logged_in:
+    st.sidebar.page_link('pages/Team_Information.py')
+    st.sidebar.page_link('pages/League_Standings.py')
+    if (st.user.email in st.secrets['admin_emails']): st.sidebar.page_link('pages/Update_Spreadsheet.py')
+
     bot = gspread.service_account_from_dict(dict(st.secrets['service_account']))
     st.session_state.sheet = bot.open_by_url(st.secrets['spreadsheet'])
 
@@ -12,4 +14,4 @@ if st.user.is_logged_in:
     st.button('Log Out', on_click = st.logout, icon = ':material/logout:')
 else:
     st.title('Log In Using Your School Email')
-    login()
+    st.button('Log In', on_click = st.login, icon = ':material/login:')
