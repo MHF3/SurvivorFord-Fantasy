@@ -25,8 +25,6 @@ if ('scoring' not in st.session_state):
         for action in column_values:
             if (action != ''): st.session_state.scoring[action] = scoring_data[0][column]
 
-    st.write(st.session_state.scoring)
-
 st.header('Add New Episode Scores')
 
 if ('points' not in st.session_state): st.session_state.points = []
