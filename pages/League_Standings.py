@@ -6,7 +6,7 @@ if (st.user.email in st.secrets['admin_emails']): st.sidebar.page_link('pages/Up
 
 teams = st.session_state.sheet.worksheet('Team Information')
 
-team_scores = {teams.col_values(2)[i + 1]: int(teams.col_values(4)[i + 1]) for i in range(len(teams.col_values(4)[1:]))}
+team_scores = {teams.cell(row, 2).value: teams.cell(row, 4).numeric_value for row in range(2, teams.row_count + 1)}
 sorted_team_scores = {team: score for team, score in sorted(team_scores.items(), key = lambda item: item[1], reverse = True)}
 
 st.header('Standings')

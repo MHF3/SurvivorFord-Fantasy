@@ -17,5 +17,6 @@ else:
     st.write(teams.cell(team, 3).value.replace(' | ', '\n\n'))
     # TODO Add other survivor info? Images?
     st.subheader(f'Total Points: {teams.cell(team, 4).numeric_value}')
-    st.write('Breakdown:')
-    # st.caption(teams.col_values.replace(' | ', '\n\n'))
+    if (teams.cell(team, 5).value != None):
+        with st.expander('Point Breakdown'):
+            st.caption(teams.cell(team, 5).value.replace(' | ', '\n\n'))

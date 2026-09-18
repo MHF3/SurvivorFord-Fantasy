@@ -4,8 +4,28 @@ st.sidebar.page_link('Log_In.py')
 st.sidebar.page_link('pages/Team_Information.py')
 st.sidebar.page_link('pages/League_Standings.py')
 
+teams = st.session_state.sheet.worksheet('Team Information')
 survivors = st.session_state.sheet.worksheet('Survivor Information')
-scoring = st.session_state.sheet.worksheet('Scoring Information')
+
+def format_sheet[T](sheet: list[list[T]]) -> list[list[T]]:
+    for r, row in enumerate(sheet):
+        for c, value in enumerate(row):
+            try: sheet[r][c] = int(value)
+            except (ValueError, TypeError): continue
+    return sheet
+
+if ('scoring' not in st.session_state):
+    st.session_state.scoring = {}
+
+    scoring = st.session_state.sheet.worksheet('Scoring Information')
+    scoring_data = format_sheet(scoring.get_all_values())
+
+    for column in range(len(scoring_data[0])):
+        column_values = [row[column] for row in scoring_data[1:]]
+        for action in column_values:
+            if (action != ''): st.session_state.scoring[action] = scoring_data[0][column]
+
+    st.write(st.session_state.scoring)
 
 st.header('Add New Episode Scores')
 
@@ -33,33 +53,51 @@ with st.container(border = True):
         for point in st.session_state.points: st.caption(f'{next(iter(point.keys()))}: {next(iter(point.values()))}')
 
 def confirmed() -> None:
-    new_row = [None for _ in range(survivors.col_count)]
+    teams_data = format_sheet(teams.get_all_values())
+    survivors_data = format_sheet(survivors.get_all_values())
+
+    new_row = [None for _ in range(len(survivors_data[0]))]
     new_row[0] = st.session_state.title
 
-    survivor_index = 0
+    survivor_column = 0
     for name in st.session_state.survivor_list:
-        survivor_index += 1
-        survivor_column = survivor_index + 1
+        survivor_column += 1
         survivor_points = []
         gained_points = 0
+        owner = -1
+        for row in range(1, len(teams_data)):
+            team_survivors = teams_data[row][2].split(' | ')
+            if (name in team_survivors):
+                owner = row
+                break
 
         for point in st.session_state.points:
             if (name == next(iter(point.keys()))):
                 point_action = next(iter(point.values()))
                 survivor_points.append(point_action)
-
-                for column in range(1, scoring.column_count + 1):
-                    value = 0
-                    if (point_action in scoring.col_values(column)): value = int(scoring.col_values(column)[0])
-                    gained_points += value
+                gained_points += st.session_state.scoring[point_action]
         
         if (survivor_points):
-            new_row[survivor_index] = ' | '.join(survivor_points)
+            new_row[survivor_column] = ' | '.join(survivor_points)
 
-            curr_points = survivors.cell(3, survivor_column).numeric_value
-            survivors.update_cell(3, survivor_column, curr_points + gained_points)
+            curr_survivor_points = survivors_data[2][survivor_column]
+            survivors_data[2][survivor_column] = curr_survivor_points + gained_points
 
-    survivors.append_row(new_row)
+            if (owner != -1):
+                curr_team_points = teams_data[owner][3]
+                teams_data[owner][3] = curr_team_points + gained_points
+
+                point_breakdown = str(teams_data[owner][4])
+                if (st.session_state.title in point_breakdown): point_breakdown = point_breakdown[:-9]
+                else: point_breakdown += f'{st.session_state.title}:'
+                for point in survivor_points: point_breakdown += f' | {name} - {point} ({st.session_state.scoring[point]})'
+                point_breakdown += ' | --- | '
+                teams_data[owner][4] = point_breakdown
+
+    survivors_data.append(new_row)
+
+    teams.update(teams_data)
+    survivors.update(survivors_data)
     
     st.session_state.title = None
     st.session_state.points = []
