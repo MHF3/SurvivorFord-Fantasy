@@ -74,8 +74,7 @@ else:
     if (st.session_state.locked): st.button('Update Predictions', icon = ':material/upload:', disabled = True)
     else:
         if (st.button('Update Predictions', icon = ':material/upload:')):
-            team = teams.col_values(1).index(st.user.email) + 1
             vote_predictions = ''
             for survivor in st.session_state.predicted_survivors: vote_predictions += f'{survivor} - {st.session_state[survivor]} | '
             vote_predictions = vote_predictions[:-3]
-            teams.update_cell(team, 6, vote_predictions)
+            teams.update_cell(st.session_state.team_row, 6, vote_predictions)
