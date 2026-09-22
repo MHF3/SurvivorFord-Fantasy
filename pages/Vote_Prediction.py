@@ -3,7 +3,9 @@ import streamlit as st
 st.sidebar.page_link('Log_In.py')
 st.sidebar.page_link('pages/Team_Information.py')
 st.sidebar.page_link('pages/League_Standings.py')
-if (st.user.email in st.secrets['admin_emails']): st.sidebar.page_link('pages/Update_Spreadsheet.py')
+if (st.user.email in st.secrets['admin_emails']):
+    st.sidebar.page_link('pages/Update_Spreadsheet.py')
+    st.sidebar.page_link('pages/Toggle_Lock.py')
 
 GROUP_POINTS = 10
 
@@ -47,20 +49,26 @@ for group in st.session_state.groups.keys():
             column_name, column_minus, column_count, column_add = st.columns([0.75, 0.1, 0.05, 0.1], gap = None, vertical_alignment = 'center')
             with column_name: st.write(survivor)
             if (survivor in st.session_state):
-                with column_minus: st.button('', f'{survivor}_unallocate', on_click = unallocate_point, args = (group, survivor), icon = ':material/remove:')
+                with column_minus:
+                    if (st.session_state.locked): st.button('', f'{survivor}_unallocate', icon = ':material/remove:', disabled = True)
+                    else: st.button('', f'{survivor}_unallocate', on_click = unallocate_point, args = (group, survivor), icon = ':material/remove:')
                 with column_count: st.write(f'**{st.session_state[survivor]}**')
             else:
                 with column_minus: st.button('', f'{survivor}_unallocate', icon = ':material/remove:', disabled = True)
                 with column_count: st.write(f'**0**')
             if (st.session_state[group]):
-                with column_add: st.button('', f'{survivor}_allocate', on_click = allocate_point, args = (group, survivor), icon = ':material/add_2:')
+                with column_add:
+                    if (st.session_state.locked): st.button('', f'{survivor}_allocate', icon = ':material/add_2:', disabled = True)
+                    else: st.button('', f'{survivor}_allocate', on_click = allocate_point, args = (group, survivor), icon = ':material/add_2:')
             else:
                 with column_add: st.button('', f'{survivor}_allocate', icon = ':material/add_2:', disabled = True)
 
-if (st.button('Update Predictions')):
-    teams = st.session_state.sheet.worksheet('Team Information')
-    team = teams.col_values(1).index(st.user.email) + 1
-    vote_predictions = ''
-    for survivor in st.session_state.predicted_survivors: vote_predictions += f'{survivor} - {st.session_state[survivor]} | '
-    vote_predictions = vote_predictions[:-3]
-    teams.update_cell(team, 6, vote_predictions)
+if (st.session_state.locked): st.button('Update Predictions', icon = ':material/upload:', disabled = True)
+else:
+    if (st.button('Update Predictions', icon = ':material/upload:')):
+        teams = st.session_state.sheet.worksheet('Team Information')
+        team = teams.col_values(1).index(st.user.email) + 1
+        vote_predictions = ''
+        for survivor in st.session_state.predicted_survivors: vote_predictions += f'{survivor} - {st.session_state[survivor]} | '
+        vote_predictions = vote_predictions[:-3]
+        teams.update_cell(team, 6, vote_predictions)

@@ -3,7 +3,9 @@ import streamlit as st
 st.sidebar.page_link('Log_In.py')
 st.sidebar.page_link('pages/Vote_Prediction.py')
 st.sidebar.page_link('pages/League_Standings.py')
-if (st.user.email in st.secrets['admin_emails']): st.sidebar.page_link('pages/Update_Spreadsheet.py')
+if (st.user.email in st.secrets['admin_emails']):
+    st.sidebar.page_link('pages/Update_Spreadsheet.py')
+    st.sidebar.page_link('pages/Toggle_Lock.py')
 
 teams = st.session_state.sheet.worksheet('Team Information')
 
@@ -11,7 +13,7 @@ if ('team_row' not in st.session_state):
     try: st.session_state.team_row = teams.col_values(1).index(st.user.email) + 1
     except ValueError: st.session_state.team_row = -1
 
-if (st.session_state.team_row == -1): st.header('Sign up in the GroupMe to create your team')
+if (st.session_state.team_row == -1): st.header('Sign up through the link in the GroupMe to create your team!')
 else:
     if ('team_name' not in st.session_state): st.session_state.team_name = teams.cell(st.session_state.team_row, 2).value
     if ('team_survivors' not in st.session_state): st.session_state.team_survivors = teams.cell(st.session_state.team_row, 3).value.replace(' | ', '\n\n')

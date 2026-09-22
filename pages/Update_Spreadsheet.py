@@ -4,6 +4,7 @@ st.sidebar.page_link('Log_In.py')
 st.sidebar.page_link('pages/Team_Information.py')
 st.sidebar.page_link('pages/Vote_Prediction.py')
 st.sidebar.page_link('pages/League_Standings.py')
+if (st.user.email in st.secrets['admin_emails']): st.sidebar.page_link('pages/Toggle_Lock.py')
 
 survivors = st.session_state.sheet.worksheet('Survivor Information')
 scoring = st.session_state.sheet.worksheet('Scoring Information')
@@ -63,7 +64,7 @@ with st.container(border = True):
 
 column_voted, column_jury = st.columns(2, vertical_alignment = 'bottom')
 
-with column_voted: st.selectbox('Voted', st.session_state.survivor_list, None, key = 'voted', placeholder = 'Who was voted out', persist_state = 'session')
+with column_voted: st.selectbox('Voted', st.session_state.playing_survivor_list, None, key = 'voted', placeholder = 'Who was voted out', persist_state = 'session')
 with column_jury: st.toggle('On Jury', key = 'jury', persist_state = 'session')
 
 def confirmed() -> None:
@@ -122,6 +123,18 @@ def confirmed() -> None:
                 point_breakdown += ' | --- | '
                 teams_data[owner][4] = point_breakdown
 
+    for owner in range(1, len(teams_data)):
+        if (teams_data[owner][5]):
+            predicted_list = str(teams_data[owner][5]).split(' | ')
+            predicted_dict = dict(prediction.split(' - ') for prediction in predicted_list)
+            if (st.session_state.voted in predicted_dict):
+                curr_team_points = teams_data[owner][3]
+                teams_data[owner][3] = curr_team_points + int(predicted_dict[st.session_state.voted])
+                point_breakdown = teams_data[owner][4][:-6]
+                point_breakdown += f'Predicted {st.session_state.voted} Vote ({predicted_dict[st.session_state.voted]}) | --- | '
+                teams_data[owner][4] = point_breakdown
+            teams_data[owner][5] = ''
+
     survivors_data.append(new_row)
 
     voted_survivor = survivors_data[0].index(st.session_state.voted)
@@ -130,9 +143,23 @@ def confirmed() -> None:
 
     teams.update(teams_data)
     survivors.update(survivors_data)
+
+    if ('team_points' in st.session_state): del st.session_state['team_points']
+    if ('team_breakdown' in st.session_state): del st.session_state['team_breakdown']
+    if ('team_scores' in st.session_state): del st.session_state['team_scores']
+    if ('predicted_survivors' in st.session_state): del st.session_state['predicted_survivors']
+    if ('groups' in st.session_state):
+        groups_delete = [group for group in st.session_state.groups.keys()]
+        for group in groups_delete:
+            for survivor in st.session_state.groups[group]:
+                if (survivor in st.session_state): del st.session_state[survivor]
+            del st.session_state[group]
+        del st.session_state['groups']
     
     st.session_state.title = None
+    st.session_state.voted = None
     st.session_state.points = []
+    st.session_state.jury = False
     st.rerun()
 
 @st.dialog('Confirm New Data')
@@ -140,5 +167,6 @@ def confirm() -> None:
     st.write('You are adding new data to the spreadsheet. It is important that this data is complete and accurate. If you are confident the data is correct, click Confirm; otherwise, click out of this dialog and verify the accuracy.')
     st.button('Confirm', on_click = confirmed)
 
-if (st.session_state.title and st.session_state.points and st.session_state.voted): st.button('Update', on_click = confirm)
-else: st.button('Update', disabled = True)
+# if (st.session_state.title and st.session_state.points and st.session_state.voted): st.button('Update', on_click = confirm)
+if (st.session_state.title and st.session_state.voted): st.button('Update', on_click = confirm, icon = ':material/database_upload:')
+else: st.button('Update', icon = ':material/database_upload:', disabled = True)

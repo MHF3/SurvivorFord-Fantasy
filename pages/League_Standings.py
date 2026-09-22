@@ -3,7 +3,9 @@ import streamlit as st
 st.sidebar.page_link('Log_In.py')
 st.sidebar.page_link('pages/Team_Information.py')
 st.sidebar.page_link('pages/Vote_Prediction.py')
-if (st.user.email in st.secrets['admin_emails']): st.sidebar.page_link('pages/Update_Spreadsheet.py')
+if (st.user.email in st.secrets['admin_emails']):
+    st.sidebar.page_link('pages/Update_Spreadsheet.py')
+    st.sidebar.page_link('pages/Toggle_Lock.py')
 
 if ('team_scores' not in st.session_state):
     teams = st.session_state.sheet.worksheet('Team Information')
