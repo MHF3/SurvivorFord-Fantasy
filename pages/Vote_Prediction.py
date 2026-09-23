@@ -49,6 +49,18 @@ else:
             del st.session_state[survivor]
             st.session_state.predicted_survivors.remove(survivor)
 
+    if ('checked_predictions' not in st.session_state):
+        curr_predictions = teams.cell(st.session_state.team_row, 6).value
+        if (curr_predictions):
+            curr_predictions_list = curr_predictions.split(' | ')
+            curr_predicted_dict = dict(curr_prediction.split(' - ') for curr_prediction in curr_predictions_list)
+            for group in st.session_state.groups.keys():
+                if (group not in st.session_state): st.session_state[group] = GROUP_POINTS
+                for survivor in st.session_state.groups[group]:
+                    if (survivor in curr_predicted_dict.keys()):
+                        for _ in range(int(curr_predicted_dict[survivor])): allocate_point(group, survivor)
+        st.session_state.checked_predictions = True
+
     for group in st.session_state.groups.keys():
         with st.container(border = True):
             if (group not in st.session_state): st.session_state[group] = GROUP_POINTS
