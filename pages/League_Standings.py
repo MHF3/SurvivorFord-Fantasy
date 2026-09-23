@@ -1,3 +1,4 @@
+import gspread
 import streamlit as st
 
 st.sidebar.page_link('Log_In.py')
@@ -6,6 +7,10 @@ st.sidebar.page_link('pages/Vote_Prediction.py')
 if (st.user.email in st.secrets['admin_emails']):
     st.sidebar.page_link('pages/Update_Spreadsheet.py')
     st.sidebar.page_link('pages/Toggle_Lock.py')
+
+if ('sheet' not in st.session_state):
+    bot = gspread.service_account_from_dict(dict(st.secrets['service_account']))
+    st.session_state.sheet = bot.open_by_url(st.secrets['spreadsheet'])
 
 if ('team_scores' not in st.session_state):
     teams = st.session_state.sheet.worksheet('Team Information')
