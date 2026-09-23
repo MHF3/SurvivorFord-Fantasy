@@ -105,7 +105,7 @@ def confirmed() -> None:
             if (survivors_data[1][survivor_index] == 'Out'):
                 survivor_points.append('Voted Out (Pre-Jury)')
                 gained_points += 1
-        
+
         if (survivor_points):
             new_row[survivor_column] = ' | '.join(survivor_points)
 
@@ -116,7 +116,7 @@ def confirmed() -> None:
                 curr_team_points = teams_data[owner][3]
                 teams_data[owner][3] = curr_team_points + gained_points
 
-                point_breakdown = str(teams_data[owner][4])
+                point_breakdown = teams_data[owner][4]
                 if (st.session_state.title in point_breakdown): point_breakdown = point_breakdown[:-9]
                 else: point_breakdown += f'{st.session_state.title}:'
                 for point in survivor_points: point_breakdown += f' | {name} - {point} ({st.session_state.scoring[point]})'
@@ -125,7 +125,7 @@ def confirmed() -> None:
 
     for owner in range(1, len(teams_data)):
         if (teams_data[owner][5]):
-            predicted_list = str(teams_data[owner][5]).split(' | ')
+            predicted_list = teams_data[owner][5].split(' | ')
             predicted_dict = dict(prediction.split(' - ') for prediction in predicted_list)
             if (st.session_state.voted in predicted_dict):
                 curr_team_points = teams_data[owner][3]
@@ -155,7 +155,7 @@ def confirmed() -> None:
                 if (survivor in st.session_state): del st.session_state[survivor]
             del st.session_state[group]
         del st.session_state['groups']
-    
+
     st.session_state.title = None
     st.session_state.voted = None
     st.session_state.points = []
