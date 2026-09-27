@@ -32,7 +32,7 @@ else:
         survivors_data = st.session_state.sheet.worksheet('Survivor Information').get_all_values()
         groups = {}
         for i in range(1, len(survivors_data[0])):
-            if (survivors_data[1][i] != 'Out' and survivors_data[1][i] != 'Jury'):
+            if (survivors_data[1][i] != 'Out' and survivors_data[1][i] != 'Jury' and survivors_data[1][i] != 'Exiled'):
                 if (survivors_data[1][i] in groups.keys()):
                     members = groups[survivors_data[1][i]]
                     members.append(survivors_data[0][i])

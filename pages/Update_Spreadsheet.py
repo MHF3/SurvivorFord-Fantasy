@@ -88,12 +88,10 @@ def confirmed() -> None:
         survivor_column += 1
         survivor_points = []
         gained_points = 0
-        owner = -1
+        owners = []
         for row in range(1, len(teams_data)):
             team_survivors = teams_data[row][2].split(' | ')
-            if (name in team_survivors):
-                owner = row
-                break
+            if (name in team_survivors): owners.append(row)
 
         for point in st.session_state.points:
             if (name == next(iter(point.keys()))):
@@ -117,7 +115,7 @@ def confirmed() -> None:
             curr_survivor_points = survivors_data[2][survivor_column]
             survivors_data[2][survivor_column] = curr_survivor_points + gained_points
 
-            if (owner != -1):
+            for owner in owners:
                 curr_team_points = teams_data[owner][3]
                 teams_data[owner][3] = curr_team_points + gained_points
 
@@ -172,6 +170,5 @@ def confirm() -> None:
     st.write('You are adding new data to the spreadsheet. It is important that this data is complete and accurate. If you are confident the data is correct, click Confirm; otherwise, click out of this dialog and verify the accuracy.')
     st.button('Confirm', on_click = confirmed)
 
-# if (st.session_state.title and st.session_state.points and st.session_state.voted): st.button('Update', on_click = confirm)
-if (st.session_state.title and st.session_state.voted): st.button('Update', on_click = confirm, icon = ':material/database_upload:')
+if (st.session_state.title and (st.session_state.points or st.session_state.voted)): st.button('Update', on_click = confirm, icon = ':material/database_upload:')
 else: st.button('Update', icon = ':material/database_upload:', disabled = True)
