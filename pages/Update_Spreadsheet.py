@@ -17,8 +17,12 @@ scoring = st.session_state.sheet.worksheet('Scoring Information')
 def format_sheet[T](sheet: list[list[T]]) -> list[list[T]]:
     for r, row in enumerate(sheet):
         for c, value in enumerate(row):
-            try: sheet[r][c] = float(value)
-            except (ValueError, TypeError): continue
+            if ('.' in sheet[r][c]):
+                try: sheet[r][c] = float(value)
+                except (ValueError, TypeError): continue
+            else:
+                try: sheet[r][c] = int(value)
+                except (ValueError, TypeError): continue
     return sheet
 
 if ('scoring' not in st.session_state):
