@@ -37,7 +37,7 @@ if ('points' not in st.session_state): st.session_state.points = []
 if ('survivor_list' not in st.session_state): st.session_state.survivor_list = [survivor for survivor in survivors.row_values(1)[1:]]
 if ('playing_survivor_list' not in st.session_state):
     survivor_name_status = survivors.get_all_values()[:2]
-    st.session_state.playing_survivor_list = [survivor_name_status[0][survivor] for survivor in range(1, len(survivor_name_status[0])) if (survivor_name_status[1][survivor] != 'Out' and survivor_name_status[1][survivor] != 'Jury')]
+    st.session_state.playing_survivor_list = [survivor_name_status[0][survivor] for survivor in range(1, len(survivor_name_status[0])) if (survivor_name_status[1][survivor] != 'Out' and survivor_name_status[1][survivor] != 'Jury' and survivor_name_status[1][survivor] != 'Quit')]
 if ('action_list' not in st.session_state):
     st.session_state.action_list = [action for column in range(scoring.column_count) for action in scoring.col_values(column + 1)[1:]]
     st.session_state.action_list.remove('Voted Out (Pre-Jury)')
